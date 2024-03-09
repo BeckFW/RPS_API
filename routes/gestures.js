@@ -34,16 +34,56 @@ const processImage = async (image) => {
     console.log(result); 
 }
 
+// Promise to run a python script. print() resolves, exceptions reject // 
+const runPython = (image, scriptName) => {
+
+    try {
+        return new Promise((resolve, reject) => {
+            const { spawn } = require("child_process"); 
+            const pyScript = spawn('python3', [`./scripts/${scriptName}.py`, image]); 
+
+            pyScript.stdout.on('data', (data) => {
+                resolve(data); 
+            }); 
+
+            /*
+            pyScript.stderr.on('data', (data) => {
+                reject(data);
+            }); 
+            */
+        });
+    } catch (error) {
+        console.log(error); 
+    }
+}
+
 router.get("/", (req, res) => {
-    // Return all available moves
-    res.json("This API will recognise relevant hand gestures in images."); 
+    // Return API Info
+    res.json("This API can recognise hand gestures relevant for Rock Paper Scissors from a still image.");
 });
 
-router.post("/",
-    bodyParser.raw({ type: "image/png", limit: "5mb" }),
- (req, res) => {
- console.log(req.body);
- res.sendStatus(200);
+router.post("/", bodyParser.raw({ type: "image/png", limit: "5mb" }), async (req, res) => {
+
+    if (!req.body) {
+        console.log("Missing Image"); 
+        res.status(400).send("Missing Image");
+    }
+
+    console.log("Image Received"); 
+    console.log(req.body);
+
+    const processedImageBuffer = await sharp(req.body); 
+    const jpegBuffer = await processedImageBuffer.toBuffer()
+
+    runPython(processedImageBuffer, "recognize_gesture")
+        .then((result) => {
+            console.log(result.toString()); 
+            res.status(200).send(result.toString()); 
+        })
+        .catch((err) => {
+            console.log("Promise rejected");
+            res.status(500).send(`Error: ${err.toString()}`);
+        })
  });
 
 // POST endpoint to handle image upload and processing
