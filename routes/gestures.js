@@ -4,7 +4,8 @@ const router = express.Router();
 
 // Promise to run a python script. print() resolves, exceptions reject // 
 const runPython = (image, scriptName) => {
-
+    console.log('Running Python');
+    //console.log('Image: ', image)
     try {
         return new Promise((resolve, reject) => {
             const { spawn } = require("child_process"); 
@@ -26,10 +27,11 @@ const runPython = (image, scriptName) => {
             }); 
 
             // Read any errors and reject promise
+            /*
             pyScript.stderr.on('data', (data) => {
                 reject(data);
             }); 
-            
+            */
         });
     } catch (error) {
         console.log(error); 
@@ -54,6 +56,7 @@ router.post('/recognise',
     bodyParser.raw({type: 'image/png', limit: '5mb'}), 
     async (req, res) => {
 
+    const image = req.body;
     // Result of processing 
     //let result = ""; 
 
@@ -65,24 +68,33 @@ router.post('/recognise',
     // Process the uploaded image
     try {
         console.log("Image received");
+        //console.log(image);
 
+        
         // Open the image buffer from request
-        const imageBuffer = Buffer.from(req.body, 'binary');
+        const imageBuffer = Buffer.from(image, 'binary');
+
+        //console.log(imageBuffer);
         
         // Start python process via Promise and pass image buffer
         runPython(imageBuffer, "recognize_gesture")
             .then((result) => {
-                console.log(result.toString()); 
-                res.status(200).send(result.toString()); 
+                const resultString = result.toString();
+                console.log(resultString);
+
+                if (resultString.startsWith("Exception", 0)) {
+                    throw "MP Exception: " + resultString.split(':')[1];
+                }
+
+                res.status(200).send(resultString); 
             })
             .catch((err) => {
                 console.log("Promise rejected");
-                res.status(500).send(`Error: ${err.toString()}`);
+                res.status(500).send('Error: ' + err);
             });
 
     } catch (error) {
-      console.error('Error processing image:', error);
-      return res.status(500).send('Error processing image.');
+        res.status(500).send('Error: ', error);
     }
   });
 
