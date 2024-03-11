@@ -17,8 +17,8 @@ recognizer = vision.GestureRecognizer.create_from_options(options)
 ## Access and Format Image ## 
 try: 
     # Get the buffer from stdin
-    image_buffer = sys.stdin.buffer.read()
-
+    image_buffer = np.asarray(sys.stdin.buffer.read())
+    #print(image_buffer)
     # convert to an image
     image = Image.open(BytesIO(image_buffer))
 
@@ -27,7 +27,7 @@ try:
         image_format=mp.ImageFormat.SRGBA, data=np.asarray(image))   
     
 except Exception as e: 
-    print("Image Exception: ", e)
+    print("Exception:", e)
 
 ## Process the Image ##
 try:
@@ -35,7 +35,7 @@ try:
     result = recognizer.recognize(image_to_process)
 
     # Send result back to Node.js
-    print(result.gestures[0][0].category_name)
+    print(str(result.gestures[0][0].category_name))
 
 except Exception as e:
     print("Exception: ", e)
