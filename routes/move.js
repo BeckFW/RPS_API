@@ -27,10 +27,10 @@ class RPS {
 
         if (random <= this.winChance) { 
             // generate a win
-            res.json({move: win(playerMove), winChance: this.winChance})
+            return({move: this.win(playerMove), winChance: this.winChance, type: "win"})
         } else {
             // loose
-            res.json({move: loose(playerMove), winChance: this.winChance})
+            return({move: this.loose(playerMove), winChance: this.winChance, type: "loss"})
         }
     }
 
@@ -138,9 +138,9 @@ router.get("/generate", (req, res) => {
     res.json({move: rpsGame.generateMove()})
 });
 
-router.get("/respond/:moveID", (req, res) => {
+router.get("/respond", (req, res) => {
     // Generate a response to a player move
-    const move = req.params.moveID.toLowerCase(); 
+    const move = req.query.moveID.toLowerCase(); 
     res.json({move: rpsGame.respond(move)})
 });
 
