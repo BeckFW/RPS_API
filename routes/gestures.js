@@ -11,7 +11,7 @@ const runPython = (image, scriptName) => {
             const { spawn } = require("child_process"); 
 
             // Create python as child process
-            const pyScript = spawn('python3', [`./scripts/${scriptName}.py`, {
+            const pyScript = spawn('python3', [`/app/scripts/${scriptName}.py`, {
                 stdio: ['pipe', 'inherit', 'inherit', 'ipc'] // to pass in image buffer
             }]); 
 
