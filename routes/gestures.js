@@ -23,7 +23,14 @@ const runPython = (image, scriptName) => {
 
             // Read any messages from stdout (print)
             pyScript.stdout.on('data', (data) => {
-                resolve(data); 
+                // Handle python output
+                console.log(data.toString());
+                if (data.toString().includes("move:")) {
+                    resolve(data.toString().split("move: ")[1]);
+                } else if (data.toString().includes("Exception")) {
+                    reject(data.toString());
+                }
+                // resolve(data); 
             }); 
 
             // Read any errors and reject promise
@@ -83,18 +90,19 @@ router.post('/recognise',
                 console.log(resultString);
 
                 if (resultString.startsWith("Exception", 0)) {
-                    throw "MP Exception: " + resultString.split(':')[1];
+                    throw "MP Exception: " + resultString;  //.split(':')[1];
                 }
 
                 res.status(200).send(resultString); 
             })
             .catch((err) => {
                 console.log("Promise rejected");
+                console.log(err);
                 res.status(500).send('Error: ' + err);
             });
 
     } catch (error) {
-        res.status(500).send('Error: ', error);
+        res.status(500).send('Error: ' + error);
     }
   });
 
