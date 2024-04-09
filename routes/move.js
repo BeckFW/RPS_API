@@ -1,7 +1,7 @@
 const express = require("express"); 
 const router = express.Router();
 
-const availableMoves = ["Rock", "Paper", "Scissors"];
+const availableMoves = ["rock", "paper", "scissors"];
 
 // Rock Paper Scissors Class //
 
@@ -119,6 +119,35 @@ class RPS {
             return this.loose(playerMove); 
         }
     }
+
+    result = (npcMove, playerMove) => {
+        // Are the moves the same
+        if (playerMove != npcMove) {
+            // Did the player win
+            switch (playerMove) {
+                case availableMoves[0]:
+                    if (npcMove == availableMoves[2]) {
+                        return "Win";
+                    }
+                    break;
+                case availableMoves[1]:
+                if (npcMove == availableMoves[0]) {
+                        return "Win";
+                    }
+                break;
+                case availableMoves[2]:
+                    if (npcMove == availableMoves[1]) {
+                        return "Win";
+                    }
+                    break;
+            }
+            // The player lost
+            return "Loss";
+        } else {
+            // The game is a draw
+            return "Draw";
+        }
+    }
 }
 // ------------------------- // 
 
@@ -144,11 +173,16 @@ router.get("/respond", (req, res) => {
     res.json({move: rpsGame.respond(move)})
 });
 
+router.get("/result/:npcMove/:playerMove", (req, res) => {
+    const npcMove = req.params.npcMove.toLowerCase();
+    const playerMove = req.params.playerMove.toLowerCase();
+    res.json({result: rpsGame.result(npcMove, playerMove)});
+}); 
+
 router.get("/win/:moveID", (req, res) => {
     // Generate a winning response
     const move = req.params.moveID.toLowerCase(); 
     res.json({move: rpsGame.win(move)});
-
 });
 
 router.get("/loose/:moveID", (req, res) => {
