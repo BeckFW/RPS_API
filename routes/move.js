@@ -23,13 +23,16 @@ class RPS {
 
     respond = (playerMove) => {
         // Respond to a player's move
+
+        // Generate a random number between 0-1
         let random = Math.random(); 
 
+        // If the random number is less than the win chance, generate a win for the NPC
         if (random <= this.winChance) { 
-            // generate a win
+            // NPC win
             return({move: this.win(playerMove), winChance: this.winChance, type: "win"})
         } else {
-            // loose
+            // NPC loss
             return({move: this.loose(playerMove), winChance: this.winChance, type: "loss"})
         }
     }
