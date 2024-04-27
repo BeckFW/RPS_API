@@ -11,7 +11,7 @@ const runPython = (image, scriptName) => {
             const { spawn } = require("child_process"); 
 
             // Create python as child process
-            const pyScript = spawn('python3', [`/app/scripts/${scriptName}.py`, {
+            const pyScript = spawn('python3', [`/app/scripts/${scriptName}.py`, { // directory set for Docker container (config in Dockerfile)
                 stdio: ['pipe', 'inherit', 'inherit', 'ipc'] // to pass in image buffer
             }]); 
 
@@ -24,14 +24,15 @@ const runPython = (image, scriptName) => {
             // Read any messages from stdout (print)
             pyScript.stdout.on('data', (data) => {
                 // Handle python output
-                console.log(data.toString());
-                if (data.toString().includes("move:")) {
-                    resolve(data.toString().split("move: ")[1]);
-                } else if (data.toString().includes("Exception")) {
-                    reject(data.toString());
+                console.log(data.toString()); // get the data as a string
+                if (data.toString().includes("move:")) { // if it contains the move
+                    resolve(data.toString().split("move: ")[1]); // get the move value
+                } else if (data.toString().includes("Exception")) { // if python script throws an exception
+                    reject(data.toString()); // reject the promise
                 }
                 // resolve(data); 
             }); 
+            // stderr removed as MediaPipe logs an error at every run, causing the promise to reject // 
 
             // Read any errors and reject promise
             /*
@@ -60,12 +61,9 @@ router.post("/", bodyParser.raw({ type: "image/png", limit: "5mb" }), async (req
 
 // POST endpoint to handle image upload and processing
 router.post('/recognise',
-    bodyParser.raw({type: 'image/png', limit: '5mb'}), 
-    async (req, res) => {
+    bodyParser.raw({type: 'image/png', limit: '5mb'}), async (req, res) => {
 
     const image = req.body;
-    // Result of processing 
-    //let result = ""; 
 
     if (!req.body) {
       console.log('No image');
@@ -75,9 +73,6 @@ router.post('/recognise',
     // Process the uploaded image
     try {
         console.log("Image received");
-        //console.log(image);
-
-        
         // Open the image buffer from request
         const imageBuffer = Buffer.from(image, 'binary');
 
@@ -87,8 +82,9 @@ router.post('/recognise',
         runPython(imageBuffer, "recognize_gesture")
             .then((result) => {
                 const resultString = result.toString();
-                console.log(resultString);
-
+                //console.log(resultString);
+                
+                // Extra error handling in case the promise didn't catch it when processing response
                 if (resultString.startsWith("Exception", 0)) {
                     throw "MP Exception: " + resultString;  //.split(':')[1];
                 }
