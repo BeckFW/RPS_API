@@ -5,8 +5,8 @@ const cors = require("cors");
 const app = express(); 
 
 // Environment Variables //
-const PORT = process.env.PORT || 3200; 
-const ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const PORT = process.env.PORT; 
+const ORIGIN = process.env.CORS_ORIGIN;
 const API_KEY = process.env.API_KEY;
 
 // {} import due to multiple exports from routes
@@ -31,4 +31,5 @@ app.use('/moves', move);
 app.listen(PORT, ()=>{
     console.log(`RPS API Running on Port ${PORT}`); 
     console.log("Available Routes: /moves, /gestures"); 
+    console.log(`CORS Origin: ${ORIGIN}`);
 }); 
