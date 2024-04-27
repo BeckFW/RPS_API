@@ -19,7 +19,7 @@ describe("Rock Paper Scissors Class", () => {
     it("Can generate a random move", () => {
         const result = rps.generateMove(); 
 
-        expect(testMoves).toContain(result); 
+        expect(lowerCaseMoves).toContain(result); 
     }); 
 
     
@@ -30,15 +30,15 @@ describe("RPS Can Win Matches", () => {
     const rps = new RPS(testMoves);
 
     it("Can WIN against ROCK", () => {
-        expect(rps.win("rock")).toBe("Paper"); 
+        expect(rps.win("rock")).toBe("paper"); 
     }); 
 
     it("Can WIN against PAPER", () => {
-        expect(rps.win("paper")).toBe("Scissors"); 
+        expect(rps.win("paper")).toBe("scissors"); 
     }); 
 
     it("Can WIN against SCISSORS", () => {
-        expect(rps.win("scissors")).toBe("Rock"); 
+        expect(rps.win("scissors")).toBe("rock"); 
     })
 }); 
 
@@ -47,15 +47,15 @@ describe("RPS Can Loose Matches", () => {
     const rps = new RPS(testMoves);
     
     it("Can LOOSE against ROCK", () => {
-        expect(rps.loose("rock")).toBe("Scissors"); 
+        expect(rps.loose("rock")).toBe("scissors"); 
     }); 
 
     it("Can LOOSE against PAPER", () => {
-        expect(rps.loose("paper")).toBe("Rock"); 
+        expect(rps.loose("paper")).toBe("rock"); 
     }); 
 
     it("Can LOOSE against SCISSORS", () => {
-        expect(rps.loose("scissors")).toBe("Paper"); 
+        expect(rps.loose("scissors")).toBe("paper"); 
     })
 }); 
 
